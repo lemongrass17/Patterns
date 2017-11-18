@@ -32,6 +32,18 @@ public class UserDataBaseHandler extends DefaultDataBaseHandler implements IUser
         }
     }
 
+    public boolean isContainLogPass(String login, String password){
+        users.clear();
+        getAllRecords();
+
+        for (int i = 0; i < users.size(); i++){
+            if (users.get(i).getLogin().equals(login) && users.get(i).getHash().equals(password)){
+                return true;
+            }
+        }
+        return false;
+    }
+
     @Override
     public boolean isContains(User user) {
         return isEnable(user.toString());
