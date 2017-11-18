@@ -1,13 +1,13 @@
+import java.io.PrintWriter;
 import java.util.ArrayList;
 
 public class UserDataBaseHandler extends DefaultDataBaseHandler implements IUserDataBaseHandler {
 
     private static UserDataBaseHandler handler;
-    private HashMD5 hashFunc;
+    private ArrayList<User> users = new ArrayList<>();
 
     private UserDataBaseHandler() {
         super("C://Users//Богдан//Desktop//Java//Parking", "UserDataBase.base");
-        hashFunc = new HashMD5();
     }
 
     public static UserDataBaseHandler getInstance() {
@@ -17,37 +17,66 @@ public class UserDataBaseHandler extends DefaultDataBaseHandler implements IUser
         return handler;
     }
 
-    @Override
-    protected String getSubString(String str) {
-        String [] subStrings = str.split(";");
-        subStrings[0] = subStrings[0].trim();
-        return subStrings[0];
+    private User fromString(String line){
+        String [] usr = line.split(";", 3);
+        for (int i = 0; i < usr.length; i++){
+            usr[i].trim();
+        }
+        return new User(usr[0], usr[1], Integer.parseInt(usr[2]));
     }
 
-    @Override
-    protected void diffDel(ArrayList<String> arrayList) {
-        for (int i = 0; i < arrayList.size() - 1; i++) {
-            String[] usr = arrayList.get(i).split(";", 2);
-            usr[0] = usr[0].trim();
-            usr[1] = usr[1].trim();
-
-            addUser(usr[0], usr[1]);
+    private void rewriteFile(){
+        flushFile();
+        for (int i = 0; i < users.size(); i++){
+            addUser(users.get(i));
         }
     }
 
     @Override
-    public boolean isContains(String login) {
-        return isEnable(login);
+    public boolean isContains(User user) {
+        return isEnable(user.toString());
     }
 
     @Override
-    public void addUser(String login, String password) {
-        String line = login + "; " + hashFunc.hash(password);
-        add(line);
+    public void addUser(User user) {
+        add(user.toString());
     }
 
     @Override
-    public void delUser(String login) {
-        del(login);
+    public void delUser(User user) {
+        del(user.toString());
+    }
+
+    @Override
+    public void incSum(User user, int sum) {
+        users.clear();
+        getAllRecords();
+
+        for (int i = 0; i < users.size(); i++){
+            if (users.get(i).equals(user)){
+                users.get(i).setMoney(users.get(i).getMoney() + sum);
+                break;
+            }
+        }
+        rewriteFile();
+    }
+
+    @Override
+    public void decSum(User user, int sum) {
+        users.clear();
+        getAllRecords();
+
+        for (int i = 0; i < users.size(); i++){
+            if (users.get(i).equals(user)){
+                users.get(i).setMoney(users.get(i).getMoney() - sum);
+                break;
+            }
+        }
+        rewriteFile();
+    }
+
+    @Override
+    protected void sendDiff(String line) {
+        users.add(fromString(line));
     }
 }

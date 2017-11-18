@@ -1,9 +1,8 @@
 public interface IParkingDataBaseHandler {
 
-    boolean isContains(String address);
-    boolean isFree(String address);
-    void addParking(String address, String numbOfParkPlaces, String numbOfOccupPlaces, String price);
-    void delParking(String address);
-    void incNumbOfOccup(String address);
-    void decNumbOfOccup(String address);
+    boolean isContains(Parking parking);
+    void addParking(Parking parking);
+    void delParking(Parking parking);
+    void incNumbOfOccup(Parking parking);
+    void decNumbOfOccup(Parking parking);
 }
